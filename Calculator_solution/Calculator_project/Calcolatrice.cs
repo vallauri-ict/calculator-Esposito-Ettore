@@ -62,6 +62,7 @@ namespace Calculator_project
                     Button newB = new Button();
                     x = bw * j + s * j + ox;
                     y = bh * i + s * i + oy;
+                    newB.Name = "Btm-" + i + "-" + j;
                     newB.Location = new Point(x, y);
                     newB.Size = new Size(bw, bh);
                     newB.Text = b[i, j].ch.ToString();
@@ -73,8 +74,12 @@ namespace Calculator_project
             RichTextBox newTB = new RichTextBox();
             x = this.Width - (ox * 2 + s * 3);
             y = oy - (ox + s);
+            newTB.Name = "Screen";
+            newTB.SelectionAlignment = HorizontalAlignment.Right;
             newTB.Location = new Point(ox, ox);
             newTB.Size = new Size(x, y);
+            newTB.Text = "12345";
+            newTB.Font = new Font("Segoe UI", 18F);
             this.Controls.Add(newTB);
         }
     }
