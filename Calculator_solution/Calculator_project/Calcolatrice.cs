@@ -90,33 +90,55 @@ namespace Calculator_project
             Screen.Location = new Point(ox, ox);
             Screen.Size = new Size(x, y);
             Screen.Text = "0";
-            Screen.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            Screen.Font = new Font("Segoe UI", 36F, FontStyle.Bold);
             Screen.ReadOnly = true;
             Screen.TabStop = false;
+            Screen.TextChanged += Screen_TextCanged;
             this.Controls.Add(Screen);
+        }
+
+        private void Screen_TextCanged(object sender, EventArgs e)
+        {
+            int newsize = 21 + (15 - Screen.Text.Length);
+            Screen.Font = new Font("Segoe UI", newsize, FontStyle.Bold);
         }
 
         private void Button_Click(object sender, EventArgs e)
         {
             Button btm = (Button)sender; //il sender è di sicuro un bottone
             ButtonStuct btmTag = (ButtonStuct)btm.Tag;
-            if(btmTag.isNum)
+            if(btmTag.isNum) //numeri
             {
                 if (Screen.Text == "0")
                     Screen.Text = "";
                 Screen.Text += btm.Text;
             }
-            else if(btmTag.isDec)
+            else if(btmTag.isDec) //virgola
             {
                 if (!Screen.Text.Contains(btmTag.ch))
                     Screen.Text += btm.Text;
             }
-            else if (btmTag.isPM)
+            else if (btmTag.isPM) //più o meno
             {
+                if (Screen.Text != "0" && Screen.Text != "0,")
                 if (!Screen.Text.Contains('-'))
                     Screen.Text = "-" + Screen.Text;
                 else
                     Screen.Text = Screen.Text.Substring(1);
+            }
+            else
+            {
+                switch(btmTag.ch)
+                {
+                    case 'C':
+                        Screen.Text = "0";
+                        break;
+                    case '←':
+                        Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
+                        if ((Screen.Text.Length == 0) || (Screen.Text == "-0") || (Screen.Text == "-"))
+                            Screen.Text = "0";
+                        break;
+                }
             }
         }
     }
