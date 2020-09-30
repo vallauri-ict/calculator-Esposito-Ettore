@@ -99,8 +99,19 @@ namespace Calculator_project
 
         private void Screen_TextCanged(object sender, EventArgs e)
         {
-            int newsize = 21 + (15 - Screen.Text.Length);
-            Screen.Font = new Font("Segoe UI", newsize, FontStyle.Bold);
+            int ext = Screen.Text.Contains('-') ? 1 : 0;
+            if (Screen.Text.Length <= 15 + ext)
+                Screen.Font = new Font("Segoe UI", 36F, FontStyle.Bold);
+            else if (Screen.Text.Length <= 18 + ext)
+                Screen.Font = new Font("Segoe UI", 30F, FontStyle.Bold);
+            else if(Screen.Text.Length <= 24 + ext)
+                Screen.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            else if(Screen.Text.Length <= 31 + ext)
+                Screen.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
+            else
+            {
+                if (ext == 1)
+            }
         }
 
         private void Button_Click(object sender, EventArgs e)
