@@ -53,6 +53,10 @@ namespace Calculator_project
 
         private RichTextBox Screen;
 
+        private double o1, o2, res;
+        private char op = ' ';
+        private bool iscal = false, isEq = false;
+
         private void Calcolatrice_Load(object sender, EventArgs e)
         {
             MakeCalculator(Buttons);
@@ -109,9 +113,7 @@ namespace Calculator_project
             else if(Screen.Text.Length <= 31 + ext)
                 Screen.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             else
-            {
-                if (ext == 1)
-            }
+                Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
         }
 
         private void Button_Click(object sender, EventArgs e)
@@ -120,22 +122,48 @@ namespace Calculator_project
             ButtonStuct btmTag = (ButtonStuct)btm.Tag;
             if(btmTag.isNum) //numeri
             {
-                if (Screen.Text == "0")
+                if (Screen.Text == "0" || iscal || isEq)
+                {
                     Screen.Text = "";
+                    if(iscal)
+                    {
+                        iscal = false;
+                        o1 = res;
+                    }
+                    if(isEq)
+                    {
+                        isEq = false;
+                        op = ' ';
+                    }
+                }   
                 Screen.Text += btm.Text;
             }
             else if(btmTag.isDec) //virgola
             {
                 if (!Screen.Text.Contains(btmTag.ch))
                     Screen.Text += btm.Text;
+                if (iscal)
+                {
+                    Screen.Text = "0,";
+                    iscal = false;
+                    o1 = res;
+                }
+                if(isEq)
+                {
+                    Screen.Text = "0,";
+                    isEq = false;
+                    op = ' ';
+                }
             }
             else if (btmTag.isPM) //più o meno
             {
-                if (Screen.Text != "0" && Screen.Text != "0,")
-                if (!Screen.Text.Contains('-'))
-                    Screen.Text = "-" + Screen.Text;
-                else
-                    Screen.Text = Screen.Text.Substring(1);
+                if (Screen.Text != "0" && !iscal && !isEq)
+                {
+                    if (!Screen.Text.Contains('-'))
+                        Screen.Text = "-" + Screen.Text;
+                    else
+                        Screen.Text = Screen.Text.Substring(1);
+                }
             }
             else
             {
@@ -143,11 +171,74 @@ namespace Calculator_project
                 {
                     case 'C':
                         Screen.Text = "0";
+                        op = ' ';
+                        isEq = false;
+                        iscal = false;
+                        break;
+                    case 'ɶ':
+                        Screen.Text = "0";
                         break;
                     case '←':
                         Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
                         if ((Screen.Text.Length == 0) || (Screen.Text == "-0") || (Screen.Text == "-"))
                             Screen.Text = "0";
+                        break;
+                    case '+':
+                    case '-':
+                    case 'X':
+                    case '÷':
+                        if (op == ' ' || iscal || isEq)
+                        {
+                            o1 = Double.Parse(Screen.Text);
+                            Screen.Text = "0";
+                        }
+                        else
+                        {
+                            o2 = Double.Parse(Screen.Text);
+                            switch(op)
+                            {
+                                case '+':
+                                    res = o1 + o2;
+                                    break;
+                                case '-':
+                                    res = o1 - o2;
+                                    break;
+                                case 'X':
+                                    res = o1 * o2;
+                                    break;
+                                case '÷':
+                                    res = o1 / o2;
+                                    break;
+                            }
+                            Screen.Text = res.ToString();
+                            iscal = true;
+                        }
+                        op = btmTag.ch;
+                        isEq = false;
+                        break;
+                    case '=':
+                        if (op != ' ' && !iscal)
+                        {
+                            o2 = Double.Parse(Screen.Text);
+                            switch (op)
+                            {
+                                case '+':
+                                    res = o1 + o2;
+                                    break;
+                                case '-':
+                                    res = o1 - o2;
+                                    break;
+                                case 'X':
+                                    res = o1 * o2;
+                                    break;
+                                case '÷':
+                                    res = o1 / o2;
+                                    break;
+                            }
+                            Screen.Text = res.ToString();
+                            isEq = true;
+                            iscal = false;
+                        }
                         break;
                 }
             }
