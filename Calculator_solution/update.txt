@@ -1,0 +1,4 @@
+Hotfix update 09/10/2020:
+-added point
+-added max 16 digit after comma
+-resolved moltiplication and division bug

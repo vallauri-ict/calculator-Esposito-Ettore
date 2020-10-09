@@ -124,28 +124,33 @@ namespace Calculator_project
 
         private void MettiPunti()
         {
-            string num = Screen.Text.Split(',')[0];
-            if (num.Contains('-'))
-                num = num.Substring(1);
-            string[] app = num.Split('.');
-            num = "";
-            for (int i = 0; i < app.Length; i++)
-                num += app[i];
-            for (int i = num.Length - 1, cont = 1; i > 0; i--, cont++)
+            if (!Screen.Text.Contains(','))
             {
-                if (cont % 3 == 0)
+                string num = Screen.Text;
+                if (num.Contains('-'))
+                    num = num.Substring(1);
+                string[] app = num.Split('.');
+                num = "";
+                for (int i = 0; i < app.Length; i++)
+                    num += app[i];
+                for (int i = num.Length - 1, cont = 1; i > 0; i--, cont++)
                 {
-                    num = num.Insert(i, ".");
-                    i--;
-                    cont = 1;
+                    if (cont % 3 == 0)
+                    {
+                        num = num.Insert(i, ".");
+                        i--;
+                        cont = 1;
+                    }
                 }
+                app = Screen.Text.Split(',');
+                string sign = Screen.Text.Contains('-') ? "-" : "";
+                if (app.Length == 1)
+                    Screen.Text = sign + num;
+                else
+                    Screen.Text = sign + num + app[1];
             }
-            app = Screen.Text.Split(',');
-            string sign = Screen.Text.Contains('-') ? "-" : "";
-            if (app.Length == 1)
-                Screen.Text = sign + num;
-            else
-                Screen.Text = sign + num + app[1];
+            else if (Screen.Text.Split(',')[1].Length > 16)
+                Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
         }
 
         private void Button_Click(object sender, EventArgs e)
@@ -233,10 +238,10 @@ namespace Calculator_project
                                     case '-':
                                         res = o1 - o2;
                                         break;
-                                    case 'x':
+                                    case 'X':
                                         res = o1 * o2;
                                         break;
-                                    case '/':
+                                    case '÷':
                                         res = o1 / o2;
                                         break;
                                     default:
