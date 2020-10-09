@@ -56,6 +56,7 @@ namespace Calculator_project
         };
 
         private RichTextBox Screen;
+        private RichTextBox History;
 
         private const char AZ = '\x0000';
         private double o1, o2, res;
@@ -96,14 +97,27 @@ namespace Calculator_project
             y = oy - (ox + s);
             Screen.Name = "Schermo";
             Screen.SelectionAlignment = HorizontalAlignment.Right;
-            Screen.Location = new Point(ox, ox);
-            Screen.Size = new Size(x, y);
+            Screen.Location = new Point(ox, Convert.ToInt32(ox + (y - (y / 1.5f))));
+            Screen.Size = new Size(x, Convert.ToInt32(y / 1.5f));
             Screen.Text = "0";
             Screen.Font = new Font("Segoe UI", 36F, FontStyle.Bold);
             Screen.ReadOnly = true;
             Screen.TabStop = false;
             Screen.TextChanged += Screen_TextCanged;
             this.Controls.Add(Screen);
+
+            //history
+            History = new RichTextBox();
+            y = oy - (ox + s) - (int)(y - (y / 1.5f));
+            History.Name = "Schermo";
+            History.SelectionAlignment = HorizontalAlignment.Right;
+            History.Location = new Point(ox, ox);
+            History.Size = new Size(x, y);
+            History.Text = "";
+            History.Font = new Font("Segoe UI", 18F, FontStyle.Regular);
+            History.ReadOnly = true;
+            History.TabStop = false;
+            this.Controls.Add(History);
         }
 
         private void Screen_TextCanged(object sender, EventArgs e)
@@ -213,19 +227,16 @@ namespace Calculator_project
                             o1 = double.Parse(Screen.Text);
                             op = btmTag.ch;
                             Screen.Text = "0";
+                            History.Text += o1.ToString() + btmTag.ch.ToString();
                         }
                         else
                         {
                             if (lbc.isOp && !lbc.isEq)
-                            {
                                 op = btmTag.ch;
-                            }
                             else
                             {
                                 if (!lbc.isEq)
-                                {
                                     o2 = double.Parse(Screen.Text);
-                                }
                                 switch (op)
                                 {
                                     case '+':
@@ -244,14 +255,42 @@ namespace Calculator_project
                                         break;
                                 }
                                 o1 = res;
+                                History.Text += o2;
                                 if (!btmTag.isEq)
                                 {
                                     op = btmTag.ch;
                                     o2 = 0;
+                                    History.Text += op;
                                 }
                                 Screen.Text = res.ToString();
                             }
                         }
+                        break;
+                    case '²':
+                        o1 = double.Parse(Screen.Text);
+                        res = Math.Pow(o1, 2);
+                        Screen.Text = res.ToString();
+                        History.Text += o1 + "^2";
+                        o1 = 0;
+                        res = 0;
+                        break;
+                    case '√':
+                        o1 = double.Parse(Screen.Text);
+                        res = Math.Sqrt(o1);
+                        Screen.Text = res.ToString();
+                        History.Text += "sqrt(" + o1 + ")";
+                        o1 = 0;
+                        res = 0;
+                        break;
+                    case '¼':
+                        o1 = double.Parse(Screen.Text);
+                        res = 1 / o1;
+                        Screen.Text = res.ToString();
+                        History.Text += "1/" + o1;
+                        o1 = 0;
+                        res = 0;
+                        break;
+                    default:
                         break;
                 }
             }
