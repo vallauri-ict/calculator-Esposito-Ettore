@@ -142,12 +142,8 @@ namespace Calculator_project
                         cont = 1;
                     }
                 }
-                app = Screen.Text.Split(',');
                 string sign = Screen.Text.Contains('-') ? "-" : "";
-                if (app.Length == 1)
-                    Screen.Text = sign + num;
-                else
-                    Screen.Text = sign + num + app[1];
+                Screen.Text = sign + num;
             }
             else if (Screen.Text.Split(',')[1].Length > 16)
                 Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
