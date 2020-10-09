@@ -24,13 +24,17 @@ namespace Calculator_project
             public bool isNum;
             public bool isDec;
             public bool isPM;
-            public ButtonStuct(char ch, bool bold, bool isNum = false, bool isDec = false, bool isPM = false)
+            public bool isOp;
+            public bool isEq;
+            public ButtonStuct(char ch, bool bold, bool isNum = false, bool isDec = false, bool isPM = false, bool isOp = false, bool isEq = false)
             {
                 this.ch = ch;
                 this.bold = bold;
                 this.isNum = isNum;
                 this.isDec = isDec;
                 this.isPM = isPM;
+                this.isOp = isOp;
+                this.isEq = isEq;
             }
         }
 
@@ -44,18 +48,19 @@ namespace Calculator_project
         ButtonStuct[,] Buttons =
         {
             { new ButtonStuct('%', false), new ButtonStuct('ɶ', false), new ButtonStuct('C', false), new ButtonStuct('←', false) },
-            { new ButtonStuct('¼', false), new ButtonStuct('²', false), new ButtonStuct('√', false), new ButtonStuct('÷', false) },
-            { new ButtonStuct('7', true, true), new ButtonStuct('8', true, true), new ButtonStuct('9', true, true), new ButtonStuct('X', false) },
-            { new ButtonStuct('4', true, true), new ButtonStuct('5', true, true), new ButtonStuct('6', true, true), new ButtonStuct('-', false) },
-            { new ButtonStuct('1', true, true), new ButtonStuct('2', true, true), new ButtonStuct('3', true, true), new ButtonStuct('+', false) },
-            { new ButtonStuct('±', false, false, false, true), new ButtonStuct('0', true, true), new ButtonStuct(',', false, false, true), new ButtonStuct('=', true) },  
+            { new ButtonStuct('¼', false), new ButtonStuct('²', false), new ButtonStuct('√', false), new ButtonStuct('÷', false, false, false, false, true) },
+            { new ButtonStuct('7', true, true), new ButtonStuct('8', true, true), new ButtonStuct('9', true, true), new ButtonStuct('X', false, false, false, false, true) },
+            { new ButtonStuct('4', true, true), new ButtonStuct('5', true, true), new ButtonStuct('6', true, true), new ButtonStuct('-', false, false, false, false, true) },
+            { new ButtonStuct('1', true, true), new ButtonStuct('2', true, true), new ButtonStuct('3', true, true), new ButtonStuct('+', false, false, false, false, true) },
+            { new ButtonStuct('±', false, false, false, true), new ButtonStuct('0', true, true), new ButtonStuct(',', false, false, true), new ButtonStuct('=', true, false, false, false, true, true) },  
         };
 
         private RichTextBox Screen;
 
+        private const char AZ = '\x0000';
         private double o1, o2, res;
-        private char op = ' ';
-        private bool iscal = false, isEq = false;
+        private char op = AZ;
+        ButtonStuct lbc;
 
         private void Calcolatrice_Load(object sender, EventArgs e)
         {
@@ -114,6 +119,33 @@ namespace Calculator_project
                 Screen.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             else
                 Screen.Text = Screen.Text.Remove(Screen.Text.Length - 1);
+            MettiPunti();
+        }
+
+        private void MettiPunti()
+        {
+            string num = Screen.Text.Split(',')[0];
+            if (num.Contains('-'))
+                num = num.Substring(1);
+            string[] app = num.Split('.');
+            num = "";
+            for (int i = 0; i < app.Length; i++)
+                num += app[i];
+            for (int i = num.Length - 1, cont = 1; i > 0; i--, cont++)
+            {
+                if (cont % 3 == 0)
+                {
+                    num = num.Insert(i, ".");
+                    i--;
+                    cont = 1;
+                }
+            }
+            app = Screen.Text.Split(',');
+            string sign = Screen.Text.Contains('-') ? "-" : "";
+            if (app.Length == 1)
+                Screen.Text = sign + num;
+            else
+                Screen.Text = sign + num + app[1];
         }
 
         private void Button_Click(object sender, EventArgs e)
@@ -122,42 +154,28 @@ namespace Calculator_project
             ButtonStuct btmTag = (ButtonStuct)btm.Tag;
             if(btmTag.isNum) //numeri
             {
-                if (Screen.Text == "0" || iscal || isEq)
+                if (lbc.isEq)
+                {
+                    Screen.Text = "0";
+                    op = AZ;
+                    o1 = 0;
+                    o2 = 0;
+                    res = 0;
+                }
+                if (Screen.Text == "0" || lbc.isOp)
                 {
                     Screen.Text = "";
-                    if(iscal)
-                    {
-                        iscal = false;
-                        o1 = res;
-                    }
-                    if(isEq)
-                    {
-                        isEq = false;
-                        op = ' ';
-                    }
-                }   
+                }
                 Screen.Text += btm.Text;
             }
             else if(btmTag.isDec) //virgola
             {
                 if (!Screen.Text.Contains(btmTag.ch))
                     Screen.Text += btm.Text;
-                if (iscal)
-                {
-                    Screen.Text = "0,";
-                    iscal = false;
-                    o1 = res;
-                }
-                if(isEq)
-                {
-                    Screen.Text = "0,";
-                    isEq = false;
-                    op = ' ';
-                }
             }
             else if (btmTag.isPM) //più o meno
             {
-                if (Screen.Text != "0" && !iscal && !isEq)
+                if (Screen.Text != "0")
                 {
                     if (!Screen.Text.Contains('-'))
                         Screen.Text = "-" + Screen.Text;
@@ -167,13 +185,14 @@ namespace Calculator_project
             }
             else
             {
-                switch(btmTag.ch)
+                switch (btmTag.ch)
                 {
                     case 'C':
                         Screen.Text = "0";
-                        op = ' ';
-                        isEq = false;
-                        iscal = false;
+                        op = AZ;
+                        o1 = 0;
+                        o2 = 0;
+                        res = 0;
                         break;
                     case 'ɶ':
                         Screen.Text = "0";
@@ -187,61 +206,55 @@ namespace Calculator_project
                     case '-':
                     case 'X':
                     case '÷':
-                        if (op == ' ' || iscal || isEq)
+                    case '=':
+                        if (op == AZ)//valore di default
                         {
-                            o1 = Double.Parse(Screen.Text);
+                            o1 = double.Parse(Screen.Text);
+                            op = btmTag.ch;
                             Screen.Text = "0";
                         }
                         else
                         {
-                            o2 = Double.Parse(Screen.Text);
-                            switch(op)
+                            if (lbc.isOp && !lbc.isEq)
                             {
-                                case '+':
-                                    res = o1 + o2;
-                                    break;
-                                case '-':
-                                    res = o1 - o2;
-                                    break;
-                                case 'X':
-                                    res = o1 * o2;
-                                    break;
-                                case '÷':
-                                    res = o1 / o2;
-                                    break;
+                                op = btmTag.ch;
                             }
-                            Screen.Text = res.ToString();
-                            iscal = true;
-                        }
-                        op = btmTag.ch;
-                        isEq = false;
-                        break;
-                    case '=':
-                        if (op != ' ' && !iscal)
-                        {
-                            o2 = Double.Parse(Screen.Text);
-                            switch (op)
+                            else
                             {
-                                case '+':
-                                    res = o1 + o2;
-                                    break;
-                                case '-':
-                                    res = o1 - o2;
-                                    break;
-                                case 'X':
-                                    res = o1 * o2;
-                                    break;
-                                case '÷':
-                                    res = o1 / o2;
-                                    break;
+                                if (!lbc.isEq)
+                                {
+                                    o2 = double.Parse(Screen.Text);
+                                }
+                                switch (op)
+                                {
+                                    case '+':
+                                        res = o1 + o2;
+                                        break;
+                                    case '-':
+                                        res = o1 - o2;
+                                        break;
+                                    case 'x':
+                                        res = o1 * o2;
+                                        break;
+                                    case '/':
+                                        res = o1 / o2;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                o1 = res;
+                                if (!btmTag.isEq)
+                                {
+                                    op = btmTag.ch;
+                                    o2 = 0;
+                                }
+                                Screen.Text = res.ToString();
                             }
-                            Screen.Text = res.ToString();
-                            isEq = true;
-                            iscal = false;
                         }
                         break;
                 }
             }
+            lbc = btmTag;
         }
     }
 }
