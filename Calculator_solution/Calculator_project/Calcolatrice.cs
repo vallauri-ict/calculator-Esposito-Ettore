@@ -172,6 +172,7 @@ namespace Calculator_project
                 if (lbc.isEq)
                 {
                     Screen.Text = "0";
+                    History.Text = "";
                     op = AZ;
                     o1 = 0;
                     o2 = 0;
@@ -204,6 +205,7 @@ namespace Calculator_project
                 {
                     case 'C':
                         Screen.Text = "0";
+                        History.Text = "";
                         op = AZ;
                         o1 = 0;
                         o2 = 0;
@@ -227,7 +229,9 @@ namespace Calculator_project
                             o1 = double.Parse(Screen.Text);
                             op = btmTag.ch;
                             Screen.Text = "0";
-                            History.Text += o1.ToString() + btmTag.ch.ToString();
+                            if(lbc.ch != '√' && lbc.ch != '²' && lbc.ch != '¼')
+                                History.Text += o1.ToString();
+                            History.Text += btmTag.ch.ToString();
                         }
                         else
                         {
