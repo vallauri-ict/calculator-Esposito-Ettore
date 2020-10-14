@@ -236,7 +236,7 @@ namespace Calculator_project
                         }
                         else if(op != AZ)
                         {
-                            if (lbc.isOp && !lbc.isEq)
+                            if (lbc.isOp && !btmTag.isEq)
                                 op = btmTag.ch;
                             else
                             {
