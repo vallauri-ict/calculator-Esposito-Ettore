@@ -48,7 +48,7 @@ namespace Calculator_project
         ButtonStuct[,] Buttons =
         {
             { new ButtonStuct('%', false), new ButtonStuct('ɶ', false), new ButtonStuct('C', false), new ButtonStuct('←', false) },
-            { new ButtonStuct('¼', false), new ButtonStuct('²', false), new ButtonStuct('√', false), new ButtonStuct('÷', false, false, false, false, true) },
+            { new ButtonStuct('¼',false, false, false, false, true), new ButtonStuct('²', false, false, false, false, true), new ButtonStuct('√', false, false, false, false, true), new ButtonStuct('÷', false, false, false, false, true) },
             { new ButtonStuct('7', true, true), new ButtonStuct('8', true, true), new ButtonStuct('9', true, true), new ButtonStuct('X', false, false, false, false, true) },
             { new ButtonStuct('4', true, true), new ButtonStuct('5', true, true), new ButtonStuct('6', true, true), new ButtonStuct('-', false, false, false, false, true) },
             { new ButtonStuct('1', true, true), new ButtonStuct('2', true, true), new ButtonStuct('3', true, true), new ButtonStuct('+', false, false, false, false, true) },
@@ -201,6 +201,7 @@ namespace Calculator_project
             }
             else
             {
+                double a, b;
                 switch (btmTag.ch)
                 {
                     case 'C':
@@ -224,7 +225,7 @@ namespace Calculator_project
                     case 'X':
                     case '÷':
                     case '=':
-                        if (op == AZ)//valore di default
+                        if (op == AZ && !btmTag.isEq)//valore di default
                         {
                             o1 = double.Parse(Screen.Text);
                             op = btmTag.ch;
@@ -233,7 +234,7 @@ namespace Calculator_project
                                 History.Text += o1.ToString();
                             History.Text += btmTag.ch.ToString();
                         }
-                        else
+                        else if(op != AZ)
                         {
                             if (lbc.isOp && !lbc.isEq)
                                 op = btmTag.ch;
@@ -241,6 +242,8 @@ namespace Calculator_project
                             {
                                 if (!lbc.isEq)
                                     o2 = double.Parse(Screen.Text);
+                                else
+                                    History.Text += op;
                                 switch (op)
                                 {
                                     case '+':
@@ -259,7 +262,8 @@ namespace Calculator_project
                                         break;
                                 }
                                 o1 = res;
-                                History.Text += o2;
+                                if (lbc.ch != '√' && lbc.ch != '²' && lbc.ch != '¼')
+                                    History.Text += o2;
                                 if (!btmTag.isEq)
                                 {
                                     op = btmTag.ch;
@@ -271,28 +275,34 @@ namespace Calculator_project
                         }
                         break;
                     case '²':
-                        o1 = double.Parse(Screen.Text);
-                        res = Math.Pow(o1, 2);
-                        Screen.Text = res.ToString();
-                        History.Text += o1 + "^2";
-                        o1 = 0;
-                        res = 0;
+                        a = double.Parse(Screen.Text);
+                        b = Math.Pow(a, 2);
+                        Screen.Text = b.ToString();
+                        History.Text += a + "^2";
+                        if (op != AZ)
+                            o2 = b;
+                        else
+                            o1 = b;
                         break;
                     case '√':
-                        o1 = double.Parse(Screen.Text);
-                        res = Math.Sqrt(o1);
-                        Screen.Text = res.ToString();
-                        History.Text += "sqrt(" + o1 + ")";
-                        o1 = 0;
-                        res = 0;
+                        a = double.Parse(Screen.Text);
+                        b = Math.Sqrt(a);
+                        Screen.Text = b.ToString();
+                        History.Text += "√" + a;
+                        if (op != AZ)
+                            o2 = b;
+                        else
+                            o1 = b;
                         break;
                     case '¼':
-                        o1 = double.Parse(Screen.Text);
-                        res = 1 / o1;
-                        Screen.Text = res.ToString();
-                        History.Text += "1/" + o1;
-                        o1 = 0;
-                        res = 0;
+                        a = double.Parse(Screen.Text);
+                        b = 1 / a;
+                        Screen.Text = b.ToString();
+                        History.Text += "1/" + a;
+                        if (op != AZ)
+                            o2 = b;
+                        else
+                            o1 = b;
                         break;
                     default:
                         break;
