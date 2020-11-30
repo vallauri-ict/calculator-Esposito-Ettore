@@ -39,7 +39,7 @@ namespace Calculator_project
         }
 
         /* { '%', 'ɶ', 'C', '←' },
-           { '¼', '²', '√', '÷' },
+           { '⅟', '²', '√', '÷' },
            { '7', '8', '9', 'X' },
            { '4', '5', '6', '-' },
            { '1', '2', '3', '+' },
@@ -48,20 +48,21 @@ namespace Calculator_project
         ButtonStuct[,] Buttons =
         {
             { new ButtonStuct('%', false), new ButtonStuct('ɶ', false), new ButtonStuct('C', false), new ButtonStuct('←', false) },
-            { new ButtonStuct('¼',false), new ButtonStuct('²', false), new ButtonStuct('√', false), new ButtonStuct('÷', false, false, false, false, true) },
+            { new ButtonStuct('⅟',false), new ButtonStuct('²', false), new ButtonStuct('√', false), new ButtonStuct('÷', false, false, false, false, true) },
             { new ButtonStuct('7', true, true), new ButtonStuct('8', true, true), new ButtonStuct('9', true, true), new ButtonStuct('X', false, false, false, false, true) },
             { new ButtonStuct('4', true, true), new ButtonStuct('5', true, true), new ButtonStuct('6', true, true), new ButtonStuct('-', false, false, false, false, true) },
             { new ButtonStuct('1', true, true), new ButtonStuct('2', true, true), new ButtonStuct('3', true, true), new ButtonStuct('+', false, false, false, false, true) },
             { new ButtonStuct('±', false, false, false, true), new ButtonStuct('0', true, true), new ButtonStuct(',', false, false, true), new ButtonStuct('=', true, false, false, false, true, true) },  
         };
 
-        private RichTextBox Screen;
-        private RichTextBox History;
+        private RichTextBox Screen; //schermo
+        private RichTextBox History; //schermo dela crnonlogia
 
         private const char AZ = '\x0000';
-        private double o1, o2, res;
-        private char op = AZ;
-        ButtonStuct lbc;
+        private const string BACKCOLOR = "#cccccc";
+        private double o1, o2, res; //o1=operatore 1, o2=operatore 2, res=risultato
+        private char op = AZ; //op=operando
+        ButtonStuct lbc; //last button clicked
 
         private void Calcolatrice_Load(object sender, EventArgs e)
         {
@@ -70,8 +71,8 @@ namespace Calculator_project
 
         private void MakeCalculator(ButtonStuct[,] b)
         {
-            //bw=button width, bh=button height, ox=offset x, oy=offset y, s=space;
-            const int bw = 109, bh = 75, ox = 11, oy = 135, s = 5;
+            //BW=button width, BH=button height, OX=offset x(margine laterale), OY=offset y(margine superiore), S=space(distanza tra le parti);
+            const int BW = 109, BH = 75, OX = 11, OY = 135, S = 5;
             int x, y;
 
             //bottoni
@@ -79,12 +80,20 @@ namespace Calculator_project
                 for (int j = 0; j < b.GetLength(1); j++)
                 {
                     Button newB = new Button();
-                    x = bw * j + s * j + ox;
-                    y = bh * i + s * i + oy;
+                    if(i == 5 && j == 3)
+                        newB.BackColor = ColorTranslator.FromHtml("#b0b0b0");
+                    else if (i <= 1 || j >= 3)
+                        newB.BackColor = ColorTranslator.FromHtml("#dddddd");
+                    else
+                        newB.BackColor = Color.White;
+                    newB.FlatStyle = FlatStyle.Flat;
+                    newB.FlatAppearance.BorderSize = 0;
+                    x = BW * j + S * j + OX;
+                    y = BH * i + S * i + OY;
                     newB.Name = "Btm-" + i + "-" + j;
                     newB.Tag = b[i, j];
                     newB.Location = new Point(x, y);
-                    newB.Size = new Size(bw, bh);
+                    newB.Size = new Size(BW, BH);
                     newB.Text = b[i, j].ch.ToString();
                     newB.Font = new Font("Segoe UI", 14F, b[i, j].bold ? FontStyle.Bold : FontStyle.Regular);
                     newB.Click += Button_Click;
@@ -93,11 +102,13 @@ namespace Calculator_project
 
             //schermo
             Screen = new RichTextBox();
-            x = this.Width - (ox * 2 + s * 3);
-            y = oy - (ox + s);
+            x = this.Width - (OX * 2 + S * 3);
+            y = OY - (OX + S);
             Screen.Name = "Schermo";
+            Screen.BackColor = ColorTranslator.FromHtml(BACKCOLOR);
+            Screen.BorderStyle = BorderStyle.None;
             Screen.SelectionAlignment = HorizontalAlignment.Right;
-            Screen.Location = new Point(ox, Convert.ToInt32(ox + (y - (y / 1.5f))));
+            Screen.Location = new Point(OX, Convert.ToInt32(OX + (y - (y / 1.5f))));
             Screen.Size = new Size(x, Convert.ToInt32(y / 1.5f));
             Screen.Text = "0";
             Screen.Font = new Font("Segoe UI", 36F, FontStyle.Bold);
@@ -108,16 +119,21 @@ namespace Calculator_project
 
             //history
             History = new RichTextBox();
-            y = oy - (ox + s) - (int)(y - (y / 1.5f));
-            History.Name = "Schermo";
+            y = OY - (OX + S) - (int)(y - (y / 1.5f));
+            History.Name = "Cronologia";
+            History.BackColor = ColorTranslator.FromHtml(BACKCOLOR);
+            History.BorderStyle = BorderStyle.None;
             History.SelectionAlignment = HorizontalAlignment.Right;
-            History.Location = new Point(ox, ox);
+            History.Location = new Point(OX, OX);
             History.Size = new Size(x, y);
             History.Text = "";
             History.Font = new Font("Segoe UI", 18F, FontStyle.Regular);
             History.ReadOnly = true;
             History.TabStop = false;
             this.Controls.Add(History);
+
+            //modifica form
+            this.BackColor = ColorTranslator.FromHtml(BACKCOLOR);
         }
 
         private void Screen_TextCanged(object sender, EventArgs e)
@@ -169,7 +185,7 @@ namespace Calculator_project
             ButtonStuct btmTag = (ButtonStuct)btm.Tag;
             if(btmTag.isNum) //numeri
             {
-                if (lbc.isEq || lbc.ch == '√' || lbc.ch == '¼' || lbc.ch == '²')
+                if (lbc.isEq || lbc.ch == '√' || lbc.ch == '⅟' || lbc.ch == '²')
                 {
                     Screen.Text = "0";  
                     History.Text = "";
@@ -230,7 +246,7 @@ namespace Calculator_project
                             o1 = double.Parse(Screen.Text);
                             op = btmTag.ch;
                             Screen.Text = "0";
-                            if (lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '¼')
+                            if (lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '⅟')
                                 History.Text += o1;
                         }
                         else if(op != AZ)
@@ -259,12 +275,12 @@ namespace Calculator_project
                                         break;
                                 }
                                 o1 = res;
-                                if (lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '¼')
+                                if (lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '⅟')
                                     History.Text += op.ToString() + o2;
                                 if (!btmTag.isEq)
                                 {
                                     op = btmTag.ch;
-                                    if(lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '¼')
+                                    if(lbc.ch != '²' && lbc.ch != '√' && lbc.ch != '⅟')
                                         History.Text += op.ToString();                          
                                     o2 = 0;
                                 }
@@ -276,7 +292,7 @@ namespace Calculator_project
                         a = double.Parse(Screen.Text);
                         b = Math.Pow(a, 2);
                         Screen.Text = b.ToString();
-                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '¼')
+                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '⅟')
                         {
                             History.Text = a + "^2";
                         }
@@ -291,7 +307,7 @@ namespace Calculator_project
                         a = double.Parse(Screen.Text);
                         b = Math.Sqrt(a);
                         Screen.Text = b.ToString();
-                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '¼')
+                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '⅟')
                         {
                             History.Text = "√" + a;
                         }
@@ -302,11 +318,11 @@ namespace Calculator_project
                             History.Text += "√" + a;
                         }
                         break;
-                    case '¼':
+                    case '⅟':
                         a = double.Parse(Screen.Text);
                         b = 1 / a;
                         Screen.Text = b.ToString();
-                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '¼')
+                        if (lbc.isEq || lbc.ch == '²' || lbc.ch == '√' || lbc.ch == '⅟')
                         {
                             History.Text = "1/" + a;
                         }
@@ -318,6 +334,7 @@ namespace Calculator_project
                         }
                         break;
                     default:
+                        MessageBox.Show("Spiacente ma l'operazione \"" + btmTag.ch + "\" non implementata");
                         break;
                 }
             }
