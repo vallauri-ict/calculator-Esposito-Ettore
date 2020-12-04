@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Calcolatrice));
             this.SuspendLayout();
             // 
             // Calcolatrice
@@ -37,7 +38,9 @@
             this.ClientSize = new System.Drawing.Size(474, 621);
             this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Calcolatrice";
+            this.ShowIcon = false;
             this.Text = "Calcolatrice";
             this.Load += new System.EventHandler(this.Calcolatrice_Load);
             this.ResumeLayout(false);
